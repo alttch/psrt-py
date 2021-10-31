@@ -130,7 +130,7 @@ class Client:
         # TODO debug log
         pass
 
-    def __init__(self, **config):
+    def __init__(self, **kwargs):
         """
         Initialize PSRT client
 
@@ -142,27 +142,24 @@ class Client:
         (as the connection is performed in the current thread, on_connect is
         used for paho-mqtt compat. only)
 
-        Args:
-            No required arguments
-
         Optional:
-            path: host:port or (host, port) tuple
-            user: user name
-            password: password
-            timeout: client timeout
-            buf_size: socket and message buffer (set 100K+ for large frames)
-            userdata: anything useful
-            tls: use TLS (default: False)
-            tls_ca: path to an alternative CA file
+            * path: host:port or (host, port) tuple
+            * user: user name
+            * password: password
+            * timeout: client timeout
+            * buf_size: socket and message buffer (set 100K+ for large frames)
+            * userdata: anything useful
+            * tls: use TLS (default: False)
+            * tls_ca: path to an alternative CA file
         """
-        self.path = config.get('path', 'localhost:2883')
-        self.user = config.get('user', '')
-        self.password = config.get('password', '')
-        self.timeout = config.get('timeout', DEFAULT_TIMEOUT)
-        self.buf_size = config.get('buf_size', BUF_SIZE)
-        self.userdata = config.get('userdata')
-        self.tls = config.get('tls', False)
-        self.tls_ca = config.get('tls_ca')
+        self.path = kwargs.get('path', 'localhost:2883')
+        self.user = kwargs.get('user', '')
+        self.password = kwargs.get('password', '')
+        self.timeout = kwargs.get('timeout', DEFAULT_TIMEOUT)
+        self.buf_size = kwargs.get('buf_size', BUF_SIZE)
+        self.userdata = kwargs.get('userdata')
+        self.tls = kwargs.get('tls', False)
+        self.tls_ca = kwargs.get('tls_ca')
         self.connected = False
         self._state = 0
         self.connect_event = threading.Event()
@@ -232,9 +229,9 @@ class Client:
         Connect the client
 
         Optional:
-            host: ovverride server host
-            port: override server port
-            keepalive: not used, for paho-mqtt compat-only
+            * host: ovverride server host
+            * port: override server port
+            * keepalive: not used, for paho-mqtt compat-only
         """
         self.connect_event.clear()
         self.connected = False
@@ -387,7 +384,7 @@ class Client:
             topic: topic name
 
         Optional:
-            qos: not used, for paho-mqtt compat-only
+            * qos: not used, for paho-mqtt compat-only
         """
         data = topic.encode()
         try:
@@ -404,7 +401,7 @@ class Client:
             topics: topic names (list or tuple)
 
         Optional:
-            qos: not used, for paho-mqtt compat-only
+            * qos: not used, for paho-mqtt compat-only
         """
         data = b'\x00'.join(t.encode() for t in topics)
         self._exec_control_command(OP_SUBSCRIBE +
@@ -418,7 +415,7 @@ class Client:
             topic: topic name
 
         Optional:
-            qos: not used, for paho-mqtt compat-only
+            * qos: not used, for paho-mqtt compat-only
         """
         data = topic.encode()
         self._exec_control_command(OP_UNSUBSCRIBE +
@@ -432,7 +429,7 @@ class Client:
             topics: topic names (list or tuple)
 
         Optional:
-            qos: not used, for paho-mqtt compat-only
+            * qos: not used, for paho-mqtt compat-only
         """
         data = b'\x00'.join(t.encode() for t in topics)
         self._exec_control_command(OP_UNSUBSCRIBE +
@@ -446,8 +443,8 @@ class Client:
             topic: topic name
             message: message (string, bytes or anyting which can be str())
         Optional:
-            qos: not used, for paho-mqtt compat-only
-            retain: not used, for paho-mqtt compat-only
+            * qos: not used, for paho-mqtt compat-only
+            * retain: not used, for paho-mqtt compat-only
         """
         topic = topic.encode()
         if isinstance(message, bytes):
@@ -479,6 +476,9 @@ class Client:
             self.control_lock.release()
 
     def bye(self):
+        """
+        End communcation
+        """
         with self.shutdown_lock:
             if self.connected:
                 self._exec_control_command(OP_BYE)
