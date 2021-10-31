@@ -10,6 +10,10 @@ from argparse import ArgumentParser
 ap = ArgumentParser()
 
 ap.add_argument('PAYLOAD_SIZE')
+ap.add_argument('-H',
+                help='host:port',
+                default='localhost:2883',
+                metavar='HOST')
 ap.add_argument('-w', help='workers', type=int, default=4)
 ap.add_argument('-i', help='iters per worker', type=int, default=10_000)
 ap.add_argument('-s', help='socket buffer size', type=int, default=1_000)
@@ -37,11 +41,11 @@ ok = False
 print('generating payload')
 payload = b'\x01' * payload_size
 # while not ok:
-    # for x in range(0, 255):
-        # payload += x.to_bytes(1, 'little')
-        # if len(payload) == payload_size:
-            # ok = True
-            # break
+# for x in range(0, 255):
+# payload += x.to_bytes(1, 'little')
+# if len(payload) == payload_size:
+# ok = True
+# break
 print('testing')
 
 
@@ -58,7 +62,7 @@ def pub(cl, i):
 try:
     clients = []
     for i in range(0, workers):
-        client = Client(path='localhost:2883', buf_size=a.s)
+        client = Client(path=a.H, buf_size=a.s)
         # client.tls = True
         # client.tls_ca = '/opt/workstuff/psrt/certs/ca.crt'
         client.connect()
