@@ -38,6 +38,17 @@ def pub_udp(target,
             need_ack=True,
             check_ack_src=True,
             **kwargs):
+    """
+    Publish message with UDP frame
+
+    Args:
+        target: host:port or (host, port) tuple
+        topic: topic to publish
+        message: message (string, bytes or anyting which can be str())
+    Optional:
+        need_ack: require server acknowledge (default: True)
+        check_ack_src: check acknowledge source (host/port, default: True)
+    """
     if isinstance(target, str):
         host, port = target.rsplit(':', maxsplit=1)
         if check_ack_src:
@@ -117,6 +128,30 @@ class Client:
         pass
 
     def __init__(self, **config):
+        """
+        Initialize PSRT client
+
+        Additioanal properties which can be set directly to client object:
+
+        * on_message = on_message(client, userdata, message) # message handler
+        * on_connect(self, client, userdata, flags, rc) # connect handler
+
+        (as the connection is performed in the current thread, on_connect is
+        used for paho-mqtt compat. only)
+
+        Args:
+            No required arguments
+
+        Optional:
+            path: host:port or (host, port) tuple
+            user: user name
+            password: password
+            timeout: client timeout
+            buf_size: socket and message buffer (set 100K+ for large frames)
+            userdata: anything useful
+            tls: use TLS (default: False)
+            tls_ca: path to an alternative CA file
+        """
         self.path = config.get('path', 'localhost:2883')
         self.user = config.get('user', '')
         self.password = config.get('password', '')
@@ -190,6 +225,14 @@ class Client:
                 time.sleep(SLEEP_STEP)
 
     def connect(self, host=None, port=2883, keepalive=None):
+        """
+        Connect the client
+
+        Optional:
+            host: ovverride server host
+            port: override server port
+            keepalive: not used, for paho-mqtt compat-only
+        """
         self.connect_event.clear()
         self.connected = False
         if host is None:
@@ -328,9 +371,21 @@ class Client:
                     self.bye()
 
     def is_connected(self):
+        """
+        Check is the client connected
+        """
         return self.connected
 
     def subscribe(self, topic, qos=None):
+        """
+        Subscribe to a topic
+
+        Args:
+            topic: topic name
+
+        Optional:
+            qos: not used, for paho-mqtt compat-only
+        """
         data = topic.encode()
         try:
             self._exec_control_command(OP_SUBSCRIBE +
@@ -339,21 +394,58 @@ class Client:
             raise AccessError(f'{self.path} topic {topic} sub access denied')
 
     def subscribe_bulk(self, topics):
+        """
+        Subscribe to topics
+
+        Args:
+            topics: topic names (list or tuple)
+
+        Optional:
+            qos: not used, for paho-mqtt compat-only
+        """
         data = b'\x00'.join(t.encode() for t in topics)
         self._exec_control_command(OP_SUBSCRIBE +
                                    len(data).to_bytes(4, 'little') + data)
 
     def unsubscribe(self, topic):
+        """
+        Unsubscribe from a topic
+
+        Args:
+            topic: topic name
+
+        Optional:
+            qos: not used, for paho-mqtt compat-only
+        """
         data = topic.encode()
         self._exec_control_command(OP_UNSUBSCRIBE +
                                    len(data).to_bytes(4, 'little') + data)
 
     def unsubscribe_bulk(self, topics):
+        """
+        Unsubscribe from topics
+
+        Args:
+            topics: topic names (list or tuple)
+
+        Optional:
+            qos: not used, for paho-mqtt compat-only
+        """
         data = b'\x00'.join(t.encode() for t in topics)
         self._exec_control_command(OP_UNSUBSCRIBE +
                                    len(data).to_bytes(4, 'little') + data)
 
     def publish(self, topic, message, qos=None, retain=None):
+        """
+        Publish a message
+
+        Args:
+            topic: topic name
+            message: message (string, bytes or anyting which can be str())
+        Optional:
+            qos: not used, for paho-mqtt compat-only
+            retain: not used, for paho-mqtt compat-only
+        """
         topic = topic.encode()
         if isinstance(message, bytes):
             pass
