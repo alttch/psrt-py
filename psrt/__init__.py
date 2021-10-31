@@ -105,6 +105,9 @@ def reduce_timeout(timeout, m):
 
 
 class Client:
+    """
+    PSRT client
+    """
 
     # paho mqtt compat
     def tls_set(self, ca_certs, *args, **kwargs):
