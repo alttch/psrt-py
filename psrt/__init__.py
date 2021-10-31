@@ -1,4 +1,4 @@
-__verison__ = '0.0.2'
+__verison__ = '0.0.3'
 
 import threading
 import socket
