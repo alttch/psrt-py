@@ -7,7 +7,7 @@ def x(client, userdata, message):
     print(message.payload)
 
 
-client = Client(path='localhost:2883')
+client = Client(path='localhost:2873')
 # client.tls = True
 # client.tls_ca = '/opt/workstuff/psrt/certs/ca.crt'
 # client.need_data_socket = False

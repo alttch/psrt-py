@@ -152,7 +152,7 @@ class Client:
             * tls: use TLS (default: False)
             * tls_ca: path to an alternative CA file
         """
-        self.path = kwargs.get('path', 'localhost:2883')
+        self.path = kwargs.get('path', 'localhost:2873')
         self.user = kwargs.get('user', '')
         self.password = kwargs.get('password', '')
         self.timeout = kwargs.get('timeout', DEFAULT_TIMEOUT)
@@ -224,7 +224,7 @@ class Client:
             while time.perf_counter() < sleep_to and self.connected:
                 time.sleep(SLEEP_STEP)
 
-    def connect(self, host=None, port=2883, keepalive=None):
+    def connect(self, host=None, port=2873, keepalive=None):
         """
         Connect the client
 

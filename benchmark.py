@@ -12,7 +12,7 @@ ap = ArgumentParser()
 ap.add_argument('PAYLOAD_SIZE')
 ap.add_argument('-H',
                 help='host:port',
-                default='localhost:2883',
+                default='localhost:2873',
                 metavar='HOST')
 ap.add_argument('-w', help='workers', type=int, default=4)
 ap.add_argument('-i', help='iters per worker', type=int, default=10_000)

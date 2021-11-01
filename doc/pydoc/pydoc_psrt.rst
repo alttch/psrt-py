@@ -38,7 +38,7 @@
       End communcation
       
    
-   .. py:method:: Client.connect(host=None, port=2883, keepalive=None)
+   .. py:method:: Client.connect(host=None, port=2873, keepalive=None)
       :module: psrt
    
       Connect the client
