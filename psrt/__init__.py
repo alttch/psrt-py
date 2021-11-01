@@ -203,17 +203,22 @@ class Client:
 
     def _exec_control_command(self, payload, from_pinger=False):
         op_start = time.perf_counter()
-        if not self.control_lock.acquire(timeout=self.timeout):
-            raise TimeoutError(f'client error {self.path} control lock timeout')
         try:
-            self.control_socket.settimeout(
-                reduce_timeout(self.timeout, op_start))
-            self.control_socket.sendall(payload)
-            self.control_socket.settimeout(
-                reduce_timeout(self.timeout, op_start))
-            self._handle_control_response(from_pinger)
-        finally:
-            self.control_lock.release()
+            if not self.control_lock.acquire(timeout=self.timeout):
+                raise TimeoutError(
+                    f'client error {self.path} control lock timeout')
+            try:
+                self.control_socket.settimeout(
+                    reduce_timeout(self.timeout, op_start))
+                self.control_socket.sendall(payload)
+                self.control_socket.settimeout(
+                    reduce_timeout(self.timeout, op_start))
+                self._handle_control_response(from_pinger)
+            finally:
+                self.control_lock.release()
+        except:
+            self._shutdown(from_pinger)
+            raise
 
     def _pinger(self):
         while self.connected:
