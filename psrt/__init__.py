@@ -48,6 +48,9 @@ def pub_udp(target,
     Optional:
         * need_ack: require server acknowledge (default: True)
         * check_ack_src: check acknowledge source (host/port, default: True)
+        * user: user name
+        * password: password
+        * timeout: socket timeout
     """
     if isinstance(target, str):
         host, port = target.rsplit(':', maxsplit=1)
