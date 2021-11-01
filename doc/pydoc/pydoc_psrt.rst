@@ -122,6 +122,9 @@
    :param message: message (string, bytes or anyting which can be str())
    
    Optional:
-       need_ack: require server acknowledge (default: True)
-       check_ack_src: check acknowledge source (host/port, default: True)
+       * need_ack: require server acknowledge (default: True)
+       * check_ack_src: check acknowledge source (host/port, default: True)
+       * user: user name
+       * password: password
+       * timeout: socket timeout
    
