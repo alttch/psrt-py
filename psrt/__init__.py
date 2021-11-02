@@ -295,38 +295,53 @@ class Client:
         self.control_socket = control_socket
         # connect data socket
         if self.need_data_socket:
-            data_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            data_socket.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF,
-                                   self.buf_size)
-            data_socket.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF,
-                                   self.buf_size)
-            data_socket.settimeout(reduce_timeout(self.timeout, op_start))
-            data_socket.connect((host, port))
-            data_socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-            data_socket.settimeout(reduce_timeout(self.timeout, op_start))
-            data_socket.sendall(DATA_HEADER +
-                                (b'\x01' if self.tls else b'\x00'))
-            if self.tls:
-                data_socket = context.wrap_socket(data_socket)
-            data_socket.settimeout(reduce_timeout(self.timeout, op_start))
-            header = data_socket.recv(2)
-            if header != DATA_HEADER:
-                raise RuntimeError('Invalid data header')
-            data_socket.settimeout(reduce_timeout(self.timeout, op_start))
-            proto = int.from_bytes(data_socket.recv(2), 'little')
-            if proto != PROTO_VERSION:
-                raise RuntimeError('Unsupported protocol')
-            data_socket.settimeout(reduce_timeout(self.timeout, op_start))
-            data_socket.sendall(token + int(self.timeout).to_bytes(1, 'little'))
-            data_socket.settimeout(reduce_timeout(self.timeout, op_start))
-            response = int.from_bytes(data_socket.recv(1), 'little')
-            if response != RESPONSE_OK:
-                self._shutdown(False)
-                raise RuntimeError(
-                    f'server error (data socket) {self.path}: {hex(response)}')
-            data_socket.settimeout(self.timeout)
-            self.data_socket = data_socket
-            threading.Thread(target=self._t_data_stream, daemon=True).start()
+            try:
+                data_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                data_socket.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF,
+                                       self.buf_size)
+                data_socket.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF,
+                                       self.buf_size)
+                data_socket.settimeout(reduce_timeout(self.timeout, op_start))
+                data_socket.connect((host, port))
+                data_socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY,
+                                       1)
+                data_socket.settimeout(reduce_timeout(self.timeout, op_start))
+                data_socket.sendall(DATA_HEADER +
+                                    (b'\x01' if self.tls else b'\x00'))
+                if self.tls:
+                    data_socket = context.wrap_socket(data_socket)
+                data_socket.settimeout(reduce_timeout(self.timeout, op_start))
+                header = data_socket.recv(2)
+                if header != DATA_HEADER:
+                    raise RuntimeError('Invalid data header')
+                data_socket.settimeout(reduce_timeout(self.timeout, op_start))
+                proto = int.from_bytes(data_socket.recv(2), 'little')
+                if proto != PROTO_VERSION:
+                    raise RuntimeError('Unsupported protocol')
+                data_socket.settimeout(reduce_timeout(self.timeout, op_start))
+                data_socket.sendall(token +
+                                    int(self.timeout).to_bytes(1, 'little'))
+                data_socket.settimeout(reduce_timeout(self.timeout, op_start))
+                response = int.from_bytes(data_socket.recv(1), 'little')
+                if response != RESPONSE_OK:
+                    self._shutdown(False)
+                    raise RuntimeError(
+                        f'server error (data socket) {self.path}: '
+                        f'{hex(response)}')
+                data_socket.settimeout(self.timeout)
+                self.data_socket = data_socket
+                threading.Thread(target=self._t_data_stream,
+                                 daemon=True).start()
+            except:
+                try:
+                    self.control_socket.close()
+                except:
+                    pass
+                try:
+                    data_socket.close()
+                except:
+                    pass
+                raise
         # run control pinger
         self.connected = True
         self._state = 1
