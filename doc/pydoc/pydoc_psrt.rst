@@ -49,6 +49,24 @@
           * keepalive: not used, for paho-mqtt compat-only
       
    
+   .. py:method:: Client.connect_cluster(paths, randomize=True)
+      :module: psrt
+   
+      Connect the client to PSRT cluster
+      
+      If randomize parameter is set to False, the nodes are chosen in the
+      listed order
+      
+      :param paths: list of node paths (host:port or tuples)
+      
+      Optional:
+          * randomize: choose random node (default: True)
+      
+      :returns: Successful node path if connected
+      
+      :raises RuntimeError: if no nodes available
+      
+   
    .. py:method:: Client.is_connected()
       :module: psrt
    

@@ -233,6 +233,40 @@ class Client:
             while time.perf_counter() < sleep_to and self.connected:
                 time.sleep(SLEEP_STEP)
 
+    def connect_cluster(self, paths, randomize=True):
+        """
+        Connect the client to PSRT cluster
+
+        If randomize parameter is set to False, the nodes are chosen in the
+        listed order
+
+        Args:
+            paths: list of node paths (host:port or tuples)
+
+        Optional:
+            * randomize: choose random node (default: True)
+
+        Returns:
+            Successful node path if connected
+
+        Raises:
+            RuntimeError: if no nodes available
+        """
+        if randomize:
+            import random
+            paths = paths.copy()
+            random.shuffle(paths)
+        for p in paths:
+            logger.info(f'trying PSRT node {p}')
+            self.path = p
+            try:
+                self.connect()
+                logger.info(f'PSRT node connected: {p}')
+                return p
+            except Exception as e:
+                logger.warning(f'Failed to connect to {p}: {e}')
+        raise RuntimeError('no nodes available')
+
     def connect(self, host=None, port=2873, keepalive=None):
         """
         Connect the client
