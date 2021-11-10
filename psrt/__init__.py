@@ -11,6 +11,8 @@ from types import SimpleNamespace
 # logger for background processes (pinger and data stream)
 logger = logging.getLogger('psrt')
 
+DEFAULT_PORT = 2873
+
 DEFAULT_TIMEOUT = 5
 BUF_SIZE = 1024
 
@@ -156,7 +158,7 @@ class Client:
             * tls: use TLS (default: False)
             * tls_ca: path to an alternative CA file
         """
-        self.path = kwargs.get('path', 'localhost:2873')
+        self.path = kwargs.get('path', f'localhost:{DEFAULT_PORT}')
         self.user = kwargs.get('user', '')
         self.password = kwargs.get('password', '')
         self.timeout = kwargs.get('timeout', DEFAULT_TIMEOUT)
@@ -270,7 +272,7 @@ class Client:
                 logger.warning(f'Failed to connect to {p}: {e}')
         raise RuntimeError('no nodes available')
 
-    def connect(self, host=None, port=2873, keepalive=None):
+    def connect(self, host=None, port=DEFAULT_PORT, keepalive=None):
         """
         Connect the client
 
@@ -282,7 +284,11 @@ class Client:
         self.connect_event.clear()
         self.connected = False
         if host is None:
-            host, port = self.path.rsplit(':', maxsplit=1)
+            if ':' in self.path:
+                host, port = self.path.rsplit(':', maxsplit=1)
+            else:
+                host = self.path
+                port = DEFAULT_PORT
         else:
             self.path = f'{host}:{port}'
         port = int(port)
