@@ -8,7 +8,7 @@ def x(client, userdata, message):
 
 
 client = Client()
-path = client.connect_cluster(paths=['localhost:2873', 'localhost:3873'])
+path = client.connect_cluster(paths='localhost:2873,localhost:3873')
 print(path)
 client.subscribe('test')
 client.subscribe_bulk(['test2', '#'])

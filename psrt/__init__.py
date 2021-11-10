@@ -241,7 +241,8 @@ class Client:
         listed order
 
         Args:
-            paths: list of node paths (host:port or tuples)
+            paths: list of node paths (host:port or tuples) or comma separated
+            string
 
         Optional:
             * randomize: choose random node (default: True)
@@ -252,6 +253,8 @@ class Client:
         Raises:
             RuntimeError: if no nodes available
         """
+        if isinstance(paths, str):
+            paths = [x for x in [x.strip() for x in paths.split(',')] if x]
         if randomize:
             import random
             paths = paths.copy()
