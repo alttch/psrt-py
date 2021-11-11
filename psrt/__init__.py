@@ -74,8 +74,8 @@ def pub_udp(target,
         message = str(message).encode()
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     client_socket.sendto(
-        CONTROL_HEADER + PROTO_VERSION.to_bytes(2, 'little') + user.encode() +
-        b'\x00' + password.encode() + b'\x00' +
+        CONTROL_HEADER + PROTO_VERSION.to_bytes(2, 'little') + b'\x00' +
+        user.encode() + b'\x00' + password.encode() + b'\x00' +
         (OP_PUBLISH if need_ack else OP_PUBLISH) + topic.encode() + b'\x00' +
         message, target)
     if need_ack:
