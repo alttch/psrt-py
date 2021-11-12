@@ -26,6 +26,7 @@ try:
     while True:
         client.subscribe('test')
         client.unsubscribe('test')
+        client.publish('unit/tests/test1', 'hello')
         time.sleep(1)
 finally:
     client.bye()
