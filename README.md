@@ -21,15 +21,13 @@ client = Client(path='localhost:2873')
 # client.need_data_socket = False
 client.on_message = process_message
 client.connect()
-try:
-    client.subscribe('test')
-    client.subscribe_bulk(['test2', '#'])
-    client.unsubscribe('test')
-    client.unsubscribe_bulk(['test2', '#'])
-    client.subscribe('#')
-    while True:
-        client.publish('unit/tests/test1', 'hello')
-        time.sleep(1)
-finally:
-    client.bye()
+client.subscribe('test')
+client.subscribe_bulk(['test2', '#'])
+client.unsubscribe('test')
+client.unsubscribe_bulk(['test2', '#'])
+client.subscribe('#')
+for _ in range(3):
+    client.publish('unit/tests/test1', 'hello')
+    time.sleep(1)
+client.bye()
 ```
