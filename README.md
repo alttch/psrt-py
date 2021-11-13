@@ -29,8 +29,6 @@ try:
     client.publish('unit/tests/test1', 'hello')
     client.on_message = process_message
     while True:
-        client.subscribe('test')
-        client.unsubscribe('test')
         client.publish('unit/tests/test1', 'hello')
         time.sleep(1)
 finally:
