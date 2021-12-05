@@ -33,12 +33,17 @@ RESPONSE_ACCESS_DENIED = 0xFE
 CONTROL_HEADER = b'\xEE\xAA'
 DATA_HEADER = b'\xEE\xAB'
 
+AUTH_LOGIN_PASS = b'\x00'
+AUTH_KEY_AES_128_GCM = b'\x02'
+AUTH_KEY_AES_256_GCM = b'\x03'
+
 
 def pub_udp(target,
             topic,
             message,
             need_ack=True,
             check_ack_src=True,
+            auth=AUTH_LOGIN_PASS,
             **kwargs):
     """
     Publish message with UDP frame
@@ -64,6 +69,7 @@ def pub_udp(target,
         target = (socket.gethostbyname(target[0]), target[1])
     user = kwargs.get('user', '')
     password = kwargs.get('password', '')
+    nonce = kwargs.get('nonce', b'\x00' * 12)
     timeout = kwargs.get('timeout', DEFAULT_TIMEOUT)
     topic = topic
     if isinstance(message, bytes):
@@ -73,11 +79,14 @@ def pub_udp(target,
     else:
         message = str(message).encode()
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    client_socket.sendto(
-        CONTROL_HEADER + PROTO_VERSION.to_bytes(2, 'little') + b'\x00' +
-        user.encode() + b'\x00' + password.encode() + b'\x00' +
-        (OP_PUBLISH if need_ack else OP_PUBLISH) + topic.encode() + b'\x00' +
-        message, target)
+    if auth == AUTH_LOGIN_PASS:
+        client_socket.sendto(
+            CONTROL_HEADER + PROTO_VERSION.to_bytes(2, 'little') +
+            AUTH_LOGIN_PASS + user.encode() + b'\x00' + password.encode() +
+            b'\x00' + (OP_PUBLISH if need_ack else OP_PUBLISH_NO_ACK) +
+            topic.encode() + b'\x00' + message, target)
+    else:
+        raise RuntimeError('UDP encryption not supported (yet)')
     if need_ack:
         client_socket.settimeout(timeout)
         (data, server) = client_socket.recvfrom(5)
