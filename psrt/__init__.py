@@ -59,6 +59,7 @@ def pub_udp(target,
         * user: user name
         * password: password
         * timeout: socket timeout
+        * auth: auth mode (password is used as AES key, str or bytes)
     """
     if isinstance(target, str):
         host, port = target.rsplit(':', maxsplit=1)
@@ -69,7 +70,6 @@ def pub_udp(target,
         target = (socket.gethostbyname(target[0]), target[1])
     user = kwargs.get('user', '')
     password = kwargs.get('password', '')
-    nonce = kwargs.get('nonce', b'\x00' * 12)
     timeout = kwargs.get('timeout', DEFAULT_TIMEOUT)
     topic = topic
     if isinstance(message, bytes):
@@ -86,7 +86,19 @@ def pub_udp(target,
             b'\x00' + (OP_PUBLISH if need_ack else OP_PUBLISH_NO_ACK) +
             topic.encode() + b'\x00' + message, target)
     else:
-        raise RuntimeError('UDP encryption not supported (yet)')
+        from Cryptodome import Random
+        from Cryptodome.Cipher import AES
+        nonce = Random.new().read(12)
+        if isinstance(password, str):
+            import binascii
+            password = binascii.unhexlify(password)
+        cipher = AES.new(password, AES.MODE_GCM, nonce)
+        frame, digest = cipher.encrypt_and_digest(
+            (OP_PUBLISH if need_ack else OP_PUBLISH_NO_ACK) + topic.encode() +
+            b'\x00' + message)
+        client_socket.sendto(
+            CONTROL_HEADER + PROTO_VERSION.to_bytes(2, 'little') + auth +
+            user.encode() + b'\x00' + nonce + frame + digest, target)
     if need_ack:
         client_socket.settimeout(timeout)
         (data, server) = client_socket.recvfrom(5)
