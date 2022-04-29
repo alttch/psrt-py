@@ -1,4 +1,4 @@
-__version__ = '0.0.18'
+__version__ = '0.0.19'
 
 import threading
 import socket
@@ -569,5 +569,8 @@ class Client:
         """
         with self.shutdown_lock:
             if self.connected:
-                self._exec_control_command(OP_BYE)
+                try:
+                    self._exec_control_command(OP_BYE)
+                except:
+                    pass
                 self._shutdown(False)
