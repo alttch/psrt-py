@@ -52,7 +52,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'yedb'
+project = 'psrt-py'
 copyright = '2021, AlterTech'
 author = 'AlterTech'
 
@@ -223,7 +223,7 @@ html_show_sourcelink = False
 #html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'yedbdoc'
+htmlhelp_basename = 'psrtpydoc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -245,7 +245,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'yedb.tex', 'YEDB Documentation', 'AlterTech', 'manual'),
+    (master_doc, 'psrtpy.tex', 'psrt-py documentation', 'AlterTech', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -272,7 +272,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [(master_doc, 'yedb', 'YEDB Documentation', [author], 1)]
+man_pages = [(master_doc, 'psrt', 'psrt-py documentation', [author], 1)]
 
 # If true, show URL addresses after external links.
 #man_show_urls = False
@@ -283,8 +283,8 @@ man_pages = [(master_doc, 'yedb', 'YEDB Documentation', [author], 1)]
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'yedb', 'YEDB Documentation', author, 'YEDB',
-     'One line description of project.', 'Miscellaneous'),
+    (master_doc, 'psrt', 'psrt-py documentation', author, 'psrt',
+     'Python client for PSRT', 'Pub/Sub client'),
 ]
 
 # Documents to append as an appendix to all manuals.
